@@ -1,0 +1,133 @@
+---
+title: "Covid19 Dashboard(Doing)"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    theme: simplex
+    vertical_layout: fill
+    source: embed
+    logo: Covid19.png
+    navbar:
+      - { icon: "fa-registered", href: "https://rpubs.com/Ryukyungjun", align: right }
+      - { icon: "fa-rss", href: "https://liujingjun.tistory.com/", align: right }
+      - { icon: "fa-github", href: "https://github.com/Jun4871/", align: right }  
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(readr)
+library(tidyverse)
+library(leaflet)
+library(httr)
+library(jsonlite)
+
+corona_haspital <- read_csv("Covid_hospital.csv",locale=locale('ko',encoding='euc-kr'))
+
+
+# 지리정보 api를 사용한 정보추출
+
+Lat_lon_fun <- function(addr) {
+  data_list <-
+    GET(url = 'https://dapi.kakao.com/v2/local/search/address.json',
+        query = list(query = addr),
+        add_headers(Authorization = paste0("KakaoAK ", "e76343071712563647f2c52e8c0b86e6"))) %>%
+    content(as = 'text') %>%
+    fromJSON()
+  lon_lat_df <- tibble(주소 = addr,
+                       long = as.numeric(data_list$documents$x),
+                       lat = as.numeric(data_list$documents$y))
+  return(lon_lat_df)
+}
+
+# Lat_lon_fun("경기도 성남시 수정구 단대동 190-4")
+
+# corona_haspital
+# 
+# for(i in 1:nrow(corona_haspital)) {
+#   Lat_lon_fun(corona_haspital$주소[i]) %>% print()
+# }
+
+corona_haspital_long_lat <- map_dfr(corona_haspital$주소, function(x) {
+  Lat_lon_fun(x)
+})
+
+
+
+```
+
+
+보건복지부 안심병원 
+=======================================================================
+
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Chart A
+
+```{r}
+
+## leaflet
+leaflet(data = corona_haspital_long_lat) %>% 
+  addTiles() %>%
+  addMarkers(~long, ~lat, popup = ~as.character(주소), label = ~as.character(주소))
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Chart Bk
+
+```{r}
+
+```
+
+
+### Chart C
+
+```{r}
+
+```
+
+### Chart C
+
+```{r}
+
+```
+
+
+
+보건복지부 안심병원 
+=======================================================================
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Chart a
+
+```{r}
+plot(iris)
+```
+
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Chart Bk
+
+```{r}
+
+```
+
+
+### Chart C
+
+```{r}
+
+```
+
+### Chart C
+
+```{r}
+
+```
