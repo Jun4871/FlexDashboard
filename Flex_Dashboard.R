@@ -46,3 +46,19 @@ corona_haspital_long_lat <- map_dfr(corona_haspital$주소, function(x) {
 leaflet(data = corona_haspital_long_lat) %>% 
   addTiles() %>%
   addMarkers(~long, ~lat, popup = ~as.character(주소), label = ~as.character(주소))
+
+
+
+### 숙제 
+corona_haspital_total <- corona_haspital %>% 
+  left_join(corona_haspital_long_lat) %>% 
+  drop_na()
+
+# corona_haspital_total
+
+## 지역별로 몇개가 있는지
+## 지역별로 있는거 ggplot (bar)
+
+
+
+# asdfasdfasdfa
